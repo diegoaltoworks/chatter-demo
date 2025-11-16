@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inline Chat Widget (Public) - Chatter Demo</title>
+  <link rel="stylesheet" href="/chatter.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f5f5f5;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      background: white;
+      border-bottom: 1px solid #e0e0e0;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header a {
+      text-decoration: none;
+      color: #666;
+      font-size: 14px;
+    }
+    header a:hover {
+      color: #1a1a1a;
+    }
+    #chat-container {
+      flex: 1;
+      max-width: 800px;
+      width: 100%;
+      margin: 0 auto;
+      background: white;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    #chat-container .chatter-ui-chat {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      border-radius: 0;
+    }
+    #chat-container .chatter-ui-chat-header {
+      display: none;
+    }
+    #chat-container .chatter-ui-chat-messages {
+      flex: 1;
+    }
+    .footer {
+      background: #2d3748;
+      color: white;
+      text-align: center;
+      padding: 40px 20px;
+      margin-top: 80px;
+    }
+    .footer p {
+      color: rgba(255, 255, 255, 0.8);
+      margin: 0 0 16px 0;
+    }
+    .footer-chatter-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: linear-gradient(135deg, #1a1a1a 0%, #3a3a3a 100%);
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: transform 0.2s;
+    }
+    .footer-chatter-link:hover {
+      transform: translateY(-2px);
+    }
+    .footer-chatter-link .chatter-icon {
+      font-size: 20px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="/">← Back to Docs</a>
+    <div></div>
+  </header>
+
+  <div id="chat-container"></div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <p>Open source • Self-hostable • Built with Bun, Hono, OpenAI, and Turso</p>
+    <a href="https://github.com/diegoaltoworks/chatter" target="_blank" class="footer-chatter-link">
+      <span class="chatter-icon">⚡</span>
+      <span>Built with Chatter</span>
+    </a>
+  </div>
+
+  <script src="/chatter.js"></script>
+  <script>
+    async function getOrCreateSession() {
+      const STORAGE_KEY = 'solestride_session';
+
+      // Check for existing session
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        const session = JSON.parse(stored);
+        // Check if still fresh
+        if (Date.now() < session.expiresAt) {
+          console.log('Reusing cached session');
+          return session.key;
+        }
+      }
+
+      // Create new session
+      const response = await fetch('/api/demo/session');
+      const data = await response.json();
+
+      // Store with expiration time (5 min safety buffer)
+      const session = {
+        key: data.key,
+        expiresAt: Date.now() + (data.expiresIn * 1000) - (5 * 60 * 1000)
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
+      console.log('Created new session');
+
+      return session.key;
+    }
+
+    (async () => {
+      try {
+        const sessionKey = await getOrCreateSession();
+
+        new Chatter.Chat({
+          host: window.location.host,
+          mode: 'public',
+          apiKey: sessionKey,
+          container: '#chat-container',
+          placeholder: 'Type your message...',
+          title: 'Public Chat',
+          subtitle: 'Ask me anything!'
+        });
+      } catch (error) {
+        console.error('Failed to create session:', error);
+        document.getElementById('chat-container').innerHTML = `
+          <div style="padding: 2rem; text-align: center;">
+            <h2>Failed to initialize chat</h2>
+            <p>Could not create a session. Please try again later.</p>
+          </div>
+        `;
+      }
+    })();
+  </script>
+</body>
+</html>

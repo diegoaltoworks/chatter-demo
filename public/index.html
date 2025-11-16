@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SoleStride Demo - Chatter Framework Chatbot</title>
+  <link rel="stylesheet" href="/chatter.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+    }
+
+    /* Header */
+    .header {
+      position: sticky;
+      top: 0;
+      background: white;
+      border-bottom: 1px solid #e0e0e0;
+      padding: 16px 0;
+      z-index: 1000;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .header-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #059669;
+      text-decoration: none;
+      transition: opacity 0.3s;
+    }
+
+    .logo:hover {
+      opacity: 0.7;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .header-links {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .icon-link {
+      color: #666;
+      text-decoration: none;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+    }
+
+    .icon-link:hover {
+      color: #059669;
+      transform: translateY(-1px);
+    }
+
+    .icon-link svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .sign-in-btn {
+      padding: 10px 24px;
+      background: #059669;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: all 0.3s;
+    }
+
+    .sign-in-btn:hover {
+      background: #047857;
+      transform: translateY(-1px);
+    }
+
+    /* Hero Section */
+    .hero {
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+      color: white;
+      padding: 80px 20px;
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-size: 3rem;
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+
+    .hero p {
+      font-size: 1.3rem;
+      margin-bottom: 40px;
+      opacity: 0.95;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .hero .cta-buttons {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 14px 32px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: all 0.3s;
+      display: inline-block;
+    }
+
+    .btn-primary {
+      background: white;
+      color: #059669;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: 2px solid white;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    /* Container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 60px 20px;
+    }
+
+    /* Section */
+    .section {
+      margin-bottom: 80px;
+    }
+
+    .section h2 {
+      font-size: 2.2rem;
+      margin-bottom: 16px;
+      color: #1a1a1a;
+      text-align: center;
+    }
+
+    .section-subtitle {
+      text-align: center;
+      font-size: 1.1rem;
+      color: #666;
+      margin-bottom: 50px;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* Demos Section */
+    .demos-section {
+      margin-bottom: 60px;
+    }
+
+    .demos-section h3 {
+      font-size: 1.8rem;
+      margin-bottom: 12px;
+      color: #1a1a1a;
+      text-align: center;
+    }
+
+    .demos-section .section-note {
+      text-align: center;
+      font-size: 1rem;
+      color: #666;
+      margin-bottom: 30px;
+    }
+
+    .demos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      margin-bottom: 60px;
+    }
+
+    .demo-card {
+      background: white;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      padding: 28px;
+      transition: all 0.3s;
+      text-decoration: none;
+      display: block;
+      position: relative;
+    }
+
+    .demo-card:hover {
+      border-color: #059669;
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(5, 150, 105, 0.15);
+    }
+
+    .demo-card-icon {
+      font-size: 2.5rem;
+      margin-bottom: 16px;
+    }
+
+    .demo-card-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 12px;
+    }
+
+    .demo-card-description {
+      font-size: 0.95rem;
+      color: #666;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    .demo-card-badges {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .badge-type {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .badge-access {
+      background: #fce7f3;
+      color: #831843;
+    }
+
+    .badge-access.public {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .demo-card-link {
+      color: #059669;
+      font-weight: 600;
+      font-size: 0.95rem;
+      text-decoration: none;
+    }
+
+    .demo-card:hover .demo-card-link {
+      text-decoration: underline;
+    }
+
+    /* Features Grid */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 30px;
+      margin-top: 40px;
+    }
+
+    .feature-card {
+      background: #f8f9fa;
+      padding: 30px;
+      border-radius: 12px;
+      text-align: center;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+
+    .feature-card .icon {
+      font-size: 3rem;
+      margin-bottom: 16px;
+    }
+
+    .feature-card h3 {
+      font-size: 1.4rem;
+      margin-bottom: 12px;
+      color: #333;
+    }
+
+    .feature-card p {
+      font-size: 0.95rem;
+      color: #666;
+      text-align: center;
+      margin: 0;
+    }
+
+    /* Footer */
+    .footer {
+      background: #2d3748;
+      color: white;
+      text-align: center;
+      padding: 40px 20px;
+      margin-top: 80px;
+    }
+
+    .footer p {
+      color: rgba(255, 255, 255, 0.8);
+      margin: 0 0 16px 0;
+    }
+
+    .footer-chatter-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: transform 0.2s;
+    }
+
+    .footer-chatter-link:hover {
+      transform: translateY(-2px);
+    }
+
+    .footer-chatter-link .chatter-icon {
+      font-size: 20px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero h1 {
+        font-size: 2rem;
+      }
+
+      .hero p {
+        font-size: 1.1rem;
+      }
+
+      .section h2 {
+        font-size: 1.8rem;
+      }
+
+      .demos-section h3 {
+        font-size: 1.5rem;
+      }
+
+      .demos-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (min-width: 769px) and (max-width: 1024px) {
+      .demos-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (min-width: 1025px) {
+      .demos-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-container">
+      <a href="/" class="logo">SoleStride Demo</a>
+      <div class="header-actions">
+        <div class="header-links">
+          <a href="https://github.com/diegoaltoworks/chatter-demo" target="_blank" rel="noopener noreferrer" class="icon-link" title="View Demo Source">
+            <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+            </svg>
+          </a>
+          <a href="https://www.npmjs.com/package/@diegoaltoworks/chatter" target="_blank" rel="noopener noreferrer" class="icon-link" title="Chatter on NPM">
+            <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path d="M0 7.334v8h6.666v1.332H12v-1.332h12v-8H0zm6.666 6.664H5.334v-4H3.999v4H1.335V8.667h5.331v5.331zm4 0v1.336H8.001V8.667h5.334v5.332h-2.669v-.001zm12.001 0h-1.33v-4h-1.336v4h-1.335v-4h-1.33v4h-2.671V8.667h8.002v5.331zM10.665 10H12v2.667h-1.335V10z"/>
+            </svg>
+          </a>
+        </div>
+        <a href="/demo/widget-button-private" class="sign-in-btn">Sign In</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <div class="hero">
+    <h1>SoleStride Demo</h1>
+    <p>A complete demo implementation of the Chatter AI chatbot framework showing public and private modes, vanilla JavaScript widgets, and React components.</p>
+    <div class="cta-buttons">
+      <a href="/demo/widget-button-public" class="btn btn-primary">Try Live Demo</a>
+      <a href="#demos" class="btn btn-secondary">View All Demos</a>
+    </div>
+  </div>
+
+  <!-- Demos Section -->
+  <div class="container">
+    <div class="section" id="demos">
+      <h2>Interactive Demos</h2>
+      <p class="section-subtitle">Explore all 8 integration options - Vanilla JavaScript widgets and React components, with both public and private authentication</p>
+
+      <!-- Widget Demos -->
+      <div class="demos-section">
+        <h3>Widget Demos</h3>
+        <p class="section-note">Vanilla JavaScript - Drop-in widgets for any website</p>
+
+        <div class="demos-grid">
+          <a href="/demo/widget-button-public" class="demo-card">
+            <div class="demo-card-icon">💬</div>
+            <h4 class="demo-card-title">Widget Button - Public</h4>
+            <div class="demo-card-badges">
+              <span class="badge badge-type">Button</span>
+              <span class="badge badge-access public">Public</span>
+            </div>
+            <p class="demo-card-description">Floating chat button with public API access. Perfect for visitor engagement on public websites.</p>
+            <span class="demo-card-link">View Demo →</span>
+          </a>
+
+          <a href="/demo/widget-button-private" class="demo-card">
+            <div class="demo-card-icon">🔒</div>
+            <h4 class="demo-card-title">Widget Button - Private</h4>
+            <div class="demo-card-badges">
+              <span class="badge badge-type">Button</span>
+              <span class="badge badge-access">Private</span>
+            </div>
+            <p class="demo-card-description">Authenticated floating button with Clerk JWT. Ideal for internal tools and authenticated users.</p>
+            <span class="demo-card-link">View Demo →</span>
+          </a>
+
+          <a href="/demo/widget-inline-public" class="demo-card">
+            <div class="demo-card-icon">💬</div>
+            <h4 class="demo-card-title">Widget Inline - Public</h4>
+            <div class="demo-card-badges">
+              <span class="badge badge-type">Inline</span>
+              <span class="badge badge-access public">Public</span>
+            </div>
+            <p class="demo-card-description">Embedded inline chat widget with public access. Great for help centers and support pages.</p>
+            <span class="demo-card-link">View Demo →</span>
+          </a>
+
+          <a href="/demo/widget-inline-private" class="demo-card">
+            <div class="demo-card-icon">🔒</div>
+            <h4 class="demo-card-title">Widget Inline - Private</h4>
+            <div class="demo-card-badges">
+              <span class="badge badge-type">Inline</span>
+              <span class="badge badge-access">Private</span>
+            </div>
+            <p class="demo-card-description">Authenticated inline chat with Clerk integration. Perfect for dashboard and admin interfaces.</p>
+            <span class="demo-card-link">View Demo →</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- React Demos -->
+      <div class="demos-section">
+        <h3>React Component Demos</h3>
+        <p class="section-note">React Components - Type-safe integration for React applications</p>
+
+        <div class="demos-grid">
+          <a href="/demo/react-button-public" class="demo-card">
+            <div class="demo-card-icon">💬</div>
+            <h4 class="demo-card-title">React Button - Public</h4>
+            <div class="demo-card-badges">
+              <span class="badge badge-type">Button</span>
+              <span class="badge badge-access public">Public</span>
+            </div>
+            <p class="demo-card-description">React ChatButton component with public API. Easy integration for React apps and Next.js sites.</p>
+            <span class="demo-card-link">View Demo →</span>
+          </a>
+
+          <a href="/demo/react-button-private" class="demo-card">
+            <div class="demo-card-icon">🔒</div>
+            <h4 class="demo-card-title">React Button - Private</h4>
+            <div class="demo-card-badges">
+              <span class="badge badge-type">Button</span>
+              <span class="badge badge-access">Private</span>
+            </div>
+            <p class="demo-card-description">Authenticated React button with Clerk. Seamless integration with protected React applications.</p>
+            <span class="demo-card-link">View Demo →</span>
+          </a>
+
+          <a href="/demo/react-inline-public" class="demo-card">
+            <div class="demo-card-icon">💬</div>
+            <h4 class="demo-card-title">React Inline - Public</h4>
+            <div class="demo-card-badges">
+              <span class="badge badge-type">Inline</span>
+              <span class="badge badge-access public">Public</span>
+            </div>
+            <p class="demo-card-description">Embedded React Chat component with public access. Full-featured chat interface for React apps.</p>
+            <span class="demo-card-link">View Demo →</span>
+          </a>
+
+          <a href="/demo/react-inline-private" class="demo-card">
+            <div class="demo-card-icon">🔒</div>
+            <h4 class="demo-card-title">React Inline - Private</h4>
+            <div class="demo-card-badges">
+              <span class="badge badge-type">Inline</span>
+              <span class="badge badge-access">Private</span>
+            </div>
+            <p class="demo-card-description">Authenticated React Chat with Clerk integration. Enterprise-ready chat for protected React routes.</p>
+            <span class="demo-card-link">View Demo →</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="section">
+      <h2>Features</h2>
+      <p class="section-subtitle">Everything you need to build a production-ready AI chatbot</p>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="icon">🏠</div>
+          <h3>Self-Hosted</h3>
+          <p>Full control over your data and infrastructure. Deploy to Google Cloud Run, Fly.io, Railway, or any container platform.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="icon">🧠</div>
+          <h3>RAG Powered</h3>
+          <p>Retrieval-Augmented Generation using vector embeddings for accurate, context-aware responses from your knowledge base.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="icon">🔐</div>
+          <h3>Public & Private</h3>
+          <p>Support for both public API keys and JWT-authenticated private endpoints with Clerk integration.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="icon">⚡</div>
+          <h3>Production Ready</h3>
+          <p>Built with Bun, Hono, TypeScript. Includes rate limiting, session keys, and comprehensive security.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="icon">🎨</div>
+          <h3>Embeddable Widgets</h3>
+          <p>Ready-to-use chat widgets that drop into any website with just a few lines of code.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="icon">⚛️</div>
+          <h3>React Components</h3>
+          <p>Flexible React components for custom implementations. Build tailored chat experiences with full type safety.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <p>Open source • Self-hostable • Built with <a href="https://github.com/diegoaltoworks/chatter" target="_blank" style="color: rgba(255, 255, 255, 0.9); text-decoration: underline;">Chatter Framework</a></p>
+    <a href="https://github.com/diegoaltoworks/chatter-demo" target="_blank" class="footer-chatter-link">
+      <span class="chatter-icon">📦</span>
+      <span>View Demo Source</span>
+    </a>
+  </div>
+
+  <!-- Add the floating chat button to this page -->
+  <script src="/chatter.js"></script>
+  <script>
+    async function getOrCreateSession() {
+      const STORAGE_KEY = 'solestride_session';
+
+      // Check for existing session
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        const session = JSON.parse(stored);
+        // Check if still fresh
+        if (Date.now() < session.expiresAt) {
+          console.log('Reusing cached session');
+          return session.key;
+        }
+      }
+
+      // Create new session
+      const response = await fetch('/api/demo/session');
+      const data = await response.json();
+
+      // Store with expiration time (5 min safety buffer)
+      const session = {
+        key: data.key,
+        expiresAt: Date.now() + (data.expiresIn * 1000) - (5 * 60 * 1000)
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
+      console.log('Created new session');
+
+      return session.key;
+    }
+
+    // Auto-fetch session key for demo
+    (async () => {
+      try {
+        const sessionKey = await getOrCreateSession();
+
+        new Chatter.ChatButton({
+          host: window.location.host,
+          mode: 'public',
+          apiKey: sessionKey,
+          position: 'bottom-right',
+          label: '💬',
+          chatConfig: {
+            title: 'SoleStride Demo',
+            subtitle: 'Ask me about our sustainable shoes!'
+          }
+        });
+      } catch (error) {
+        console.error('Failed to create session:', error);
+      }
+    })();
+  </script>
+</body>
+</html>

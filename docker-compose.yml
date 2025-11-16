@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  chatter-demo:
+    build: .
+    ports:
+      - "8181:8181"
+    environment:
+      - NODE_ENV=production
+      - PORT=8181
+      # OpenAI
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      # Turso Database
+      - TURSO_URL=${TURSO_URL}
+      - TURSO_AUTH_TOKEN=${TURSO_AUTH_TOKEN}
+      # API Key Secret
+      - CHATBOT_SECRET=${CHATBOT_SECRET}
+      # JWT Auth (optional)
+      - JWT_JWKS_URL=${JWT_JWKS_URL}
+      - JWT_ISSUER=${JWT_ISSUER}
+      - JWT_AUDIENCE=${JWT_AUDIENCE}
+      # Clerk (optional)
+      - CLERK_PUBLISHABLE_KEY=${CLERK_PUBLISHABLE_KEY}
+      - CLERK_FRONTEND_URL=${CLERK_FRONTEND_URL}
+      # Rate Limits
+      - RATE_LIMIT_RPM_PUBLIC=${RATE_LIMIT_RPM_PUBLIC:-60}
+      - RATE_LIMIT_RPM_PRIVATE=${RATE_LIMIT_RPM_PRIVATE:-120}
+    env_file:
+      - .env
+    restart: unless-stopped
+    # Uncomment for development with live reload
+    # volumes:
+    #   - ./config:/app/config
+    #   - ./public:/app/public

@@ -1,0 +1,18 @@
+{
+  "bot": {
+    "name": "SoleBot",
+    "personName": "SoleStride",
+    "publicUrl": "https://solestride.example.com",
+    "description": "AI assistant for SoleStride - sustainable footwear with purpose"
+  },
+  "branding": {
+    "publicPrimaryColor": "#059669",
+    "privatePrimaryColor": "#7c3aed"
+  },
+  "chat": {
+    "publicTitle": "Chat with SoleStride",
+    "publicSubtitle": "Questions about our shoes? We're here to help!",
+    "privateTitle": "SoleStride Team Chat",
+    "privateSubtitle": "Internal support & operations"
+  }
+}

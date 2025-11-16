@@ -1,0 +1,39 @@
+# Fly.io deployment configuration
+# Deploy with: fly launch (first time) or fly deploy
+# Uses Node.js via Dockerfile
+
+app = "chatter-demo"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  PORT = "8080"
+  NODE_ENV = "production"
+
+[[services]]
+  internal_port = 8080
+  protocol = "tcp"
+
+  [[services.ports]]
+    handlers = ["http"]
+    port = 80
+
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = 443
+
+  # Auto-scaling configuration
+  [[services.http_checks]]
+    interval = 10000
+    grace_period = "5s"
+    method = "GET"
+    path = "/"
+    protocol = "http"
+    timeout = 2000
+
+# Resource limits (adjust based on your needs)
+[vm]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 256

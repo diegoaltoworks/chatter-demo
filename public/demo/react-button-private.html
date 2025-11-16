@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>React ChatButton (Private) - Chatter Demo</title>
+  <link rel="stylesheet" href="/chatter.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f5f5f5;
+      min-height: 100vh;
+    }
+    header {
+      background: white;
+      border-bottom: 1px solid #e0e0e0;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header a {
+      text-decoration: none;
+      color: #666;
+      font-size: 14px;
+    }
+    header a:hover {
+      color: #1a1a1a;
+    }
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.9rem;
+      color: #666;
+    }
+    .user-info button {
+      padding: 0.5rem 1rem;
+      background: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 0.25rem;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    h1 {
+      color: #1a1a1a;
+      margin-bottom: 8px;
+    }
+    .subtitle {
+      color: #666;
+      margin-bottom: 32px;
+      font-size: 16px;
+    }
+    .info-box {
+      background: white;
+      border-left: 4px solid #1a1a1a;
+      padding: 20px;
+      margin: 24px 0;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .info-box strong {
+      display: block;
+      margin-bottom: 8px;
+      color: #1a1a1a;
+    }
+    .auth-box {
+      background: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 20px;
+      margin: 24px 0;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .success-box {
+      background: #d4edda;
+      border-left: 4px solid #28a745;
+      padding: 20px;
+      margin: 24px 0;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      display: none;
+    }
+    code {
+      background: #f0f0f0;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+    }
+    pre {
+      background: #1a1a1a;
+      color: #f0f0f0;
+      padding: 20px;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 16px 0;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    pre code {
+      background: none;
+      color: inherit;
+      padding: 0;
+    }
+    #clerk-sign-in {
+      max-width: 400px;
+      margin: 20px auto;
+    }
+    .loading {
+      text-align: center;
+      padding: 20px;
+      color: #666;
+    }
+    .footer {
+      background: #2d3748;
+      color: white;
+      text-align: center;
+      padding: 40px 20px;
+      margin-top: 80px;
+    }
+    .footer p {
+      color: rgba(255, 255, 255, 0.8);
+      margin: 0 0 16px 0;
+    }
+    .footer-chatter-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: linear-gradient(135deg, #1a1a1a 0%, #3a3a3a 100%);
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: transform 0.2s;
+    }
+    .footer-chatter-link:hover {
+      transform: translateY(-2px);
+    }
+    .footer-chatter-link .chatter-icon {
+      font-size: 20px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="/">← Back to Docs</a>
+    <div class="user-info" id="userInfo" style="display:none;">
+      <span id="userEmail"></span>
+      <button id="signOutButton">Sign Out</button>
+    </div>
+  </header>
+
+  <div class="container">
+    <h1>React ChatButton (Private Mode)</h1>
+    <p class="subtitle">Using React + Clerk for authenticated floating chat button</p>
+
+    <div class="auth-box" id="authRequired">
+      <strong>Authentication Required</strong>
+      <p>Please sign in to access the private chat widget.</p>
+      <div class="loading" id="loadingClerk">Loading authentication...</div>
+      <div id="clerk-sign-in" style="display:none;"></div>
+    </div>
+
+    <div class="success-box" id="authSuccess">
+      <strong>Authenticated!</strong>
+      <p>You're now signed in. Look for the chat button in the bottom-right corner.</p>
+    </div>
+
+    <h2>Installation</h2>
+    <pre><code>npm install react react-dom @clerk/clerk-react @diegoaltoworks/chatter
+# or
+bun add react react-dom @clerk/clerk-react @diegoaltoworks/chatter</code></pre>
+
+    <h2>React + Clerk Integration</h2>
+    <p>Wrap your app with ClerkProvider and use the ChatButton component with authentication:</p>
+
+    <pre><code>import React from 'react';
+import { ClerkProvider, useAuth } from '@clerk/clerk-react';
+import { ChatButton } from '@diegoaltoworks/chatter/client';
+import '@diegoaltoworks/chatter/client/style.css';
+
+function ChatButtonWithAuth() {
+  const { getToken, isSignedIn } = useAuth();
+
+  if (!isSignedIn) return null;
+
+  return (
+    &lt;ChatButton
+      host="your-api-url.com"
+      mode="private"
+      apiKey="YOUR_API_KEY_HERE"
+      token={async () => await getToken()}
+      position="bottom-right"
+      label="🔒"
+      chatConfig={{
+        title: 'Private Chat',
+        subtitle: 'Internal support'
+      }}
+    /&gt;
+  );
+}
+
+function App() {
+  return (
+    &lt;ClerkProvider publishableKey={process.env.CLERK_PUBLISHABLE_KEY}&gt;
+      &lt;ChatButtonWithAuth /&gt;
+    &lt;/ClerkProvider&gt;
+  );
+}</code></pre>
+
+    <h2>How This Demo Works</h2>
+    <p>This page uses React with the ChatButton component and Clerk authentication:</p>
+
+    <pre><code>import React from 'react';
+import { ChatButton } from '@diegoaltoworks/chatter';
+import { useAuth } from '@clerk/clerk-react';
+import '@diegoaltoworks/chatter/style.css';
+
+function App() {
+  const { getToken } = useAuth();
+
+  return (
+    &lt;ChatButton
+      host="your-api-url.com"
+      mode="private"
+      apiKey="YOUR_API_KEY_HERE"
+      token={async () => await getToken()}
+      position="bottom-right"
+      label="🔒"
+      chatConfig={{
+        title: 'Private Chat',
+        subtitle: 'Internal support'
+      }}
+    /&gt;
+  );
+}</code></pre>
+
+    <h2>Configuration Options</h2>
+    <ul style="line-height: 1.8; color: #444;">
+      <li><code>host</code> - Your API host (e.g., 'bot.diegoalto.app')</li>
+      <li><code>mode</code> - Set to <code>'private'</code> for private knowledge base access</li>
+      <li><code>apiKey</code> - Session key from your API</li>
+      <li><code>token</code> - JWT token from Clerk (function or string)</li>
+      <li><code>position</code> - Button position: <code>'bottom-right'</code>, <code>'bottom-left'</code>, etc.</li>
+      <li><code>label</code> - Button text/emoji (default: '🔒')</li>
+      <li><code>chatConfig</code> - Chat window configuration</li>
+    </ul>
+
+    <div class="info-box" style="display:none;" id="tryNow">
+      <strong>Try it now!</strong>
+      <p>After signing in, click the chat button in the bottom-right corner to start chatting with React + Clerk!</p>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <p>Open source • Self-hostable • Built with Bun, Hono, OpenAI, and Turso</p>
+    <a href="https://github.com/diegoaltoworks/chatter" target="_blank" class="footer-chatter-link">
+      <span class="chatter-icon">⚡</span>
+      <span>Built with Chatter</span>
+    </a>
+  </div>
+
+  <!-- React from CDN -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+
+  <!-- Chatter widget script -->
+  <script src="/chatter.js"></script>
+
+  <!-- Main App Script -->
+  <script>
+    let clerkInstance;
+    let chatButtonInstance;
+    let NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+
+    async function loadConfig() {
+      try {
+        const response = await fetch('/config');
+        const config = await response.json();
+        NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY = config.clerkPublishableKey;
+
+        if (!NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) {
+          throw new Error('Clerk publishable key not configured');
+        }
+
+        const script = document.createElement('script');
+        script.src = `${config.clerkFrontendUrl}/npm/@clerk/clerk-js@5/dist/clerk.browser.js`;
+        script.async = true;
+        script.crossOrigin = 'anonymous';
+        script.type = 'text/javascript';
+        script.setAttribute('data-clerk-publishable-key', NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
+        script.onload = initializeClerk;
+        script.onerror = () => {
+          document.getElementById('loadingClerk').innerHTML =
+            '<span style="color:#dc3545;">Failed to load Clerk SDK</span>';
+        };
+        document.head.appendChild(script);
+      } catch (error) {
+        console.error('Failed to load config:', error);
+        document.getElementById('loadingClerk').innerHTML =
+          `<span style="color:#dc3545;">Configuration error: ${error.message}</span>`;
+      }
+    }
+
+    loadConfig();
+
+    async function initializeClerk() {
+      try {
+        clerkInstance = window.Clerk;
+        await clerkInstance.load();
+
+        if (clerkInstance.user) {
+          await showChatButton();
+        } else {
+          document.getElementById('loadingClerk').style.display = 'none';
+          document.getElementById('clerk-sign-in').style.display = 'block';
+
+          const signInDiv = document.getElementById('clerk-sign-in');
+          clerkInstance.mountSignIn(signInDiv, {
+            afterSignInUrl: window.location.href,
+          });
+        }
+
+        clerkInstance.addListener(async (state) => {
+          if (state.user) {
+            await showChatButton();
+          }
+        });
+      } catch (error) {
+        console.error('Failed to initialize Clerk:', error);
+        document.getElementById('loadingClerk').innerHTML =
+          '<span style="color:#dc3545;">Authentication service unavailable</span>';
+      }
+    }
+
+    async function getOrCreateSession() {
+      const STORAGE_KEY = 'solestride_session';
+
+      // Check for existing session
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        const session = JSON.parse(stored);
+        // Check if still fresh
+        if (Date.now() < session.expiresAt) {
+          console.log('Reusing cached session');
+          return session.key;
+        }
+      }
+
+      // Create new session
+      const response = await fetch('/api/demo/session');
+      const data = await response.json();
+
+      // Store with expiration time (5 min safety buffer)
+      const session = {
+        key: data.key,
+        expiresAt: Date.now() + (data.expiresIn * 1000) - (5 * 60 * 1000)
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
+      console.log('Created new session');
+
+      return session.key;
+    }
+
+    async function showChatButton() {
+      const user = clerkInstance.user;
+
+      document.getElementById('authRequired').style.display = 'none';
+      document.getElementById('authSuccess').style.display = 'block';
+      document.getElementById('tryNow').style.display = 'block';
+      document.getElementById('userInfo').style.display = 'flex';
+      document.getElementById('userEmail').textContent =
+        user.primaryEmailAddress?.emailAddress || 'Private User';
+
+      if (!chatButtonInstance) {
+        const token = await clerkInstance.session.getToken();
+        const sessionKey = await getOrCreateSession();
+
+        chatButtonInstance = new Chatter.ChatButton({
+          host: window.location.host,
+          mode: 'private',
+          apiKey: sessionKey,
+          token: token,
+          position: 'bottom-right',
+          label: '🔒',
+          chatConfig: {
+            title: 'React Private Chat',
+            subtitle: 'Internal support'
+          }
+        });
+      }
+    }
+
+    document.getElementById('signOutButton')?.addEventListener('click', async () => {
+      await clerkInstance?.signOut();
+      window.location.reload();
+    });
+  </script>
+</body>
+</html>
