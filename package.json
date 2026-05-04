@@ -20,13 +20,13 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@diegoaltoworks/chatter": "^0.1.8",
-    "@libsql/client": "^0.14.0",
-    "hono": "^4.6.14",
+    "@diegoaltoworks/chatter": "^0.16.0",
+    "@libsql/client": "^0.17.2",
+    "hono": "^4.12.14",
     "jose": "^5.9.6",
-    "openai": "^4.77.0",
+    "openai": "^6.34.0",
     "undici": "^6.21.0",
-    "zod": "^3.24.1"
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
